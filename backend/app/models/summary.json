@@ -1,0 +1,149 @@
+{
+  "heart_disease": {
+    "dataset_key": "heart_disease",
+    "display_name": "Heart Disease",
+    "positive_label": "Disease present",
+    "feature_names": [
+      "age",
+      "sex",
+      "cp",
+      "trestbps",
+      "chol",
+      "fbs",
+      "restecg",
+      "thalach",
+      "exang",
+      "oldpeak",
+      "slope",
+      "ca",
+      "thal"
+    ],
+    "best_model": "random_forest",
+    "leaderboard": {
+      "logistic_regression": {
+        "accuracy": 0.8033,
+        "f1": 0.8333,
+        "roc_auc": 0.869
+      },
+      "svm_rbf": {
+        "accuracy": 0.8197,
+        "f1": 0.8493,
+        "roc_auc": 0.8831
+      },
+      "random_forest": {
+        "accuracy": 0.8197,
+        "f1": 0.8533,
+        "roc_auc": 0.9064
+      },
+      "xgboost": {
+        "accuracy": 0.7705,
+        "f1": 0.8,
+        "roc_auc": 0.8452
+      }
+    },
+    "n_samples": 303,
+    "n_features": 13
+  },
+  "diabetes": {
+    "dataset_key": "diabetes",
+    "display_name": "Diabetes",
+    "positive_label": "Diabetic",
+    "feature_names": [
+      "Pregnancies",
+      "Glucose",
+      "BloodPressure",
+      "SkinThickness",
+      "Insulin",
+      "BMI",
+      "DiabetesPedigreeFunction",
+      "Age"
+    ],
+    "best_model": "xgboost",
+    "leaderboard": {
+      "logistic_regression": {
+        "accuracy": 0.7143,
+        "f1": 0.56,
+        "roc_auc": 0.823
+      },
+      "svm_rbf": {
+        "accuracy": 0.7532,
+        "f1": 0.6346,
+        "roc_auc": 0.7924
+      },
+      "random_forest": {
+        "accuracy": 0.7532,
+        "f1": 0.6346,
+        "roc_auc": 0.8121
+      },
+      "xgboost": {
+        "accuracy": 0.7532,
+        "f1": 0.6481,
+        "roc_auc": 0.8315
+      }
+    },
+    "n_samples": 768,
+    "n_features": 8
+  },
+  "breast_cancer": {
+    "dataset_key": "breast_cancer",
+    "display_name": "Breast Cancer",
+    "positive_label": "Malignant",
+    "feature_names": [
+      "mean radius",
+      "mean texture",
+      "mean perimeter",
+      "mean area",
+      "mean smoothness",
+      "mean compactness",
+      "mean concavity",
+      "mean concave points",
+      "mean symmetry",
+      "mean fractal dimension",
+      "radius error",
+      "texture error",
+      "perimeter error",
+      "area error",
+      "smoothness error",
+      "compactness error",
+      "concavity error",
+      "concave points error",
+      "symmetry error",
+      "fractal dimension error",
+      "worst radius",
+      "worst texture",
+      "worst perimeter",
+      "worst area",
+      "worst smoothness",
+      "worst compactness",
+      "worst concavity",
+      "worst concave points",
+      "worst symmetry",
+      "worst fractal dimension"
+    ],
+    "best_model": "logistic_regression",
+    "leaderboard": {
+      "logistic_regression": {
+        "accuracy": 0.9649,
+        "f1": 0.9512,
+        "roc_auc": 0.996
+      },
+      "svm_rbf": {
+        "accuracy": 0.9737,
+        "f1": 0.963,
+        "roc_auc": 0.9947
+      },
+      "random_forest": {
+        "accuracy": 0.9737,
+        "f1": 0.963,
+        "roc_auc": 0.9944
+      },
+      "xgboost": {
+        "accuracy": 0.9649,
+        "f1": 0.95,
+        "roc_auc": 0.9937
+      }
+    },
+    "n_samples": 569,
+    "n_features": 30
+  }
+}

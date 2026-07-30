@@ -1,0 +1,45 @@
+{
+  "dataset_key": "heart_disease",
+  "display_name": "Heart Disease",
+  "positive_label": "Disease present",
+  "feature_names": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "best_model": "random_forest",
+  "leaderboard": {
+    "logistic_regression": {
+      "accuracy": 0.8033,
+      "f1": 0.8333,
+      "roc_auc": 0.869
+    },
+    "svm_rbf": {
+      "accuracy": 0.8197,
+      "f1": 0.8493,
+      "roc_auc": 0.8831
+    },
+    "random_forest": {
+      "accuracy": 0.8197,
+      "f1": 0.8533,
+      "roc_auc": 0.9064
+    },
+    "xgboost": {
+      "accuracy": 0.7705,
+      "f1": 0.8,
+      "roc_auc": 0.8452
+    }
+  },
+  "n_samples": 303,
+  "n_features": 13
+}

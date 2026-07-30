@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" font-family="Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F6E6A"/>
+      <stop offset="100%" stop-color="#0A4F4C"/>
+    </linearGradient>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="300" fill="url(#bg)"/>
+  <rect width="1200" height="300" fill="url(#grid)"/>
+
+  <circle cx="90" cy="90" r="34" fill="none" stroke="#EDF2F1" stroke-width="2"/>
+  <path d="M62 90 H80 L86 72 L98 118 L108 90 H118" fill="none" stroke="#EDF2F1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="150" y="82" fill="#EDF2F1" font-size="40" font-weight="700" letter-spacing="-0.5">Vital Signs</text>
+  <text x="150" y="112" fill="#BFE3DE" font-size="16" letter-spacing="0.5">Disease Prediction from Medical Data — CodeAlpha ML Internship, Task 4</text>
+
+  <path d="M0,210 L260,210 L285,210 L300,165 L322,255 L344,210 L400,210 L800,210 L822,160 L844,260 L866,210 L920,210 L1200,210"
+        fill="none" stroke="#EDF2F1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+
+  <text x="150" y="255" fill="#8FCFC7" font-size="14" letter-spacing="0.5">Logistic Regression · SVM · Random Forest · XGBoost</text>
+  <text x="150" y="277" fill="#8FCFC7" font-size="14" letter-spacing="0.5">Structured clinical data  +  photo-based screening</text>
+</svg>

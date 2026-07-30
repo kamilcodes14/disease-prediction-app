@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vital Signs — Disease Prediction from Medical Data</title>
+<meta name="description" content="Predicts disease risk from structured medical data and screening photos. CodeAlpha ML Internship — Task 4." />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M4 16 H11 L13.5 9 L18 23 L20.5 16 H28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Vital Signs</span>
+    </div>
+    <nav class="header-nav">
+      <a href="#screen">Screen a Patient</a>
+      <a href="#about">Method &amp; Limits</a>
+      <a href="https://github.com/" id="repo-link" target="_blank" rel="noopener">Source</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <p class="eyebrow">CodeAlpha Machine Learning Internship — Task 4</p>
+      <h1>Read the signal <span class="hero-divider">before</span> it becomes a symptom.</h1>
+      <p class="hero-sub">
+        A screening tool that reasons over structured clinical measurements — and,
+        as an added capability, over a photo of a visible finding — to estimate disease risk.
+        Built on real classifiers trained on the Cleveland Heart Disease, Pima Indians Diabetes,
+        and Wisconsin Breast Cancer datasets.
+      </p>
+      <div class="hero-cta">
+        <a href="#screen" class="btn btn-primary">Start a screening</a>
+        <a href="#about" class="btn btn-ghost">How this works</a>
+      </div>
+    </div>
+    <svg class="ecg-line" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+      <path id="ecg-path" d="M0,60 L140,60 L165,60 L180,20 L200,100 L220,60 L260,60 L900,60 L920,15 L940,105 L960,60 L1000,60 L1200,60"
+        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </section>
+
+  <!-- SCREENING PANEL -->
+  <section id="screen" class="panel-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Instrument panel</p>
+        <h2>Run a screening</h2>
+      </div>
+
+      <div class="mode-toggle" role="tablist">
+        <button class="mode-btn is-active" data-mode="structured" role="tab" aria-selected="true">
+          <span class="mode-index">DATA</span> Structured clinical data
+        </button>
+        <button class="mode-btn" data-mode="image" role="tab" aria-selected="false">
+          <span class="mode-index">SCAN</span> Photo screening
+        </button>
+      </div>
+
+      <!-- STRUCTURED MODE -->
+      <div class="mode-pane is-active" data-pane="structured">
+        <div class="instrument">
+          <div class="instrument-controls">
+            <label class="field-label" for="dataset-select">Condition to screen for</label>
+            <select id="dataset-select" class="select"></select>
+
+            <form id="structured-form" class="dynamic-form"></form>
+
+            <button id="structured-submit" class="btn btn-primary btn-block" type="button">
+              Run prediction
+            </button>
+            <p class="hint">Values pre-filled from a real patient record in the training set — edit any field and re-run.</p>
+          </div>
+
+          <div class="readout" id="structured-readout">
+            <div class="readout-empty">
+              <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M12 8v5M12 16h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              <p>Run a prediction to see the readout.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMAGE MODE -->
+      <div class="mode-pane" data-pane="image">
+        <div class="instrument">
+          <div class="instrument-controls">
+            <label class="field-label">Upload a screening photo</label>
+            <div id="dropzone" class="dropzone">
+              <input type="file" id="image-input" accept="image/*" hidden />
+              <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              <p><strong>Drop a photo</strong> or click to choose one</p>
+              <p class="hint">JPG or PNG of a visible skin finding (mole, lesion, rash)</p>
+            </div>
+            <img id="image-preview" alt="Selected preview" hidden />
+            <button id="image-submit" class="btn btn-primary btn-block" type="button" disabled>
+              Analyze photo
+            </button>
+          </div>
+
+          <div class="readout" id="image-readout">
+            <div class="readout-empty">
+              <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M3 7h3l2-3h8l2 3h3v13H3V7Z"/><circle cx="12" cy="13" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <p>Upload a photo to see the readout.</p>
+            </div>
+          </div>
+        </div>
+        <p class="disclaimer" id="image-disclaimer">
+          Prototype computer-vision pipeline using ABCD-rule heuristics (asymmetry, border, color, diameter) —
+          not trained on clinical imaging data. Educational / portfolio use only, not a real diagnostic tool.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / METHOD -->
+  <section id="about" class="about-section">
+    <div class="wrap about-grid">
+      <div>
+        <p class="eyebrow">Method</p>
+        <h2>What's actually running under the hood</h2>
+        <p>
+          Three classifiers are trained on real, public medical datasets — Logistic Regression,
+          an RBF Support Vector Machine, Random Forest, and XGBoost are each evaluated on a held-out
+          test split, and the strongest performer by ROC-AUC is the one serving predictions.
+        </p>
+        <div class="dataset-cards" id="dataset-cards"></div>
+      </div>
+      <div>
+        <p class="eyebrow">Photo screening — added capability</p>
+        <h2>An honest note on the image feature</h2>
+        <p>
+          There's no ethically-sourced, labeled clinical imaging dataset used here — so instead of
+          faking a deep learning model, the photo screening pipeline extracts real, measurable
+          image features (color variegation, edge/border irregularity, texture entropy, left-right
+          and top-bottom asymmetry) and classifies with a Random Forest. It's a genuine,
+          working computer-vision pipeline, built around the same
+          <strong>ABCD rule</strong> dermatologists are taught — but it is a portfolio prototype,
+          not a validated diagnostic device. Swap in a real labeled dataset (e.g. HAM10000 / ISIC)
+          before this ever informs a real decision.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>Built for the CodeAlpha Machine Learning Internship — Task 4: Disease Prediction from Medical Data.</span>
+    <span class="footer-note">Screening estimates only. Not medical advice.</span>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
