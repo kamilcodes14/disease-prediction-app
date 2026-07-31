@@ -288,12 +288,7 @@
       // Photo screening still needs a backend (scikit-image feature
       // extraction isn't ported to JS yet). If no API_BASE is set,
       // tell the user plainly instead of failing silently.
-      if (!API_BASE) {
-        errorReadout(readout, "Photo screening isn't available in the static build yet — this feature still needs a backend.");
-        return;
-      }
-
-      readout.innerHTML = `<div class="readout-empty"><p>Analyzing photo…</p></div>`;
+           readout.innerHTML = `<div class="readout-empty"><p>Analyzing photo…</p></div>`;
       const formData = new FormData();
       formData.append("file", currentFile);
       try {
