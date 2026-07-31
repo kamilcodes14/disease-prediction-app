@@ -1,13 +1,10 @@
 import io
-import json
 import os
 
-import joblib
-import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
-from pydantic import BaseModel, Field
+import joblib
 
 from image_features import extract_features
 
@@ -16,73 +13,23 @@ MODEL_DIR = os.path.join(HERE, "models")
 
 app = FastAPI(
     title="CodeAlpha Disease Prediction API",
-    description="Structured-data + image-based disease screening (Task 4)",
-    version="1.0.0",
+    description="Image-based disease screening (structured predictions now run client-side via ONNX)",
+    version="1.1.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten to your deployed frontend origin in production
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-DATASETS = ["heart_disease", "diabetes", "breast_cancer"]
-
-_models, _scalers, _metadata = {}, {}, {}
-for key in DATASETS:
-    _models[key] = joblib.load(os.path.join(MODEL_DIR, f"{key}_model.joblib"))
-    _scalers[key] = joblib.load(os.path.join(MODEL_DIR, f"{key}_scaler.joblib"))
-    with open(os.path.join(MODEL_DIR, f"{key}_metadata.json")) as f:
-        _metadata[key] = json.load(f)
-
 _image_model = joblib.load(os.path.join(MODEL_DIR, "image_screen_model.joblib"))
-
-
-class StructuredPredictRequest(BaseModel):
-    dataset: str = Field(..., description="one of: heart_disease, diabetes, breast_cancer")
-    features: dict[str, float] = Field(..., description="feature_name -> value")
 
 
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
-
-
-@app.get("/api/datasets")
-def list_datasets():
-    """Feature schema + model info for every structured dataset, so the
-    frontend can render the right form fields dynamically."""
-    return {key: _metadata[key] for key in DATASETS}
-
-
-@app.post("/api/predict/structured")
-def predict_structured(req: StructuredPredictRequest):
-    if req.dataset not in DATASETS:
-        raise HTTPException(400, f"dataset must be one of {DATASETS}")
-
-    meta = _metadata[req.dataset]
-    order = meta["feature_names"]
-    missing = [f for f in order if f not in req.features]
-    if missing:
-        raise HTTPException(400, f"missing features: {missing}")
-
-    x = np.array([[req.features[f] for f in order]])
-    x_scaled = _scalers[req.dataset].transform(x)
-    model = _models[req.dataset]
-
-    proba = float(model.predict_proba(x_scaled)[0, 1])
-    prediction = int(proba >= 0.5)
-
-    return {
-        "dataset": req.dataset,
-        "display_name": meta["display_name"],
-        "positive_label": meta["positive_label"],
-        "prediction": prediction,
-        "probability": round(proba, 4),
-        "risk_level": "high" if proba >= 0.66 else "moderate" if proba >= 0.33 else "low",
-        "model_used": meta["best_model"],
-    }
 
 
 @app.post("/api/predict/image")
@@ -124,5 +71,4 @@ async def predict_image(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
