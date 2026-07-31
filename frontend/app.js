@@ -1,5 +1,5 @@
 (() => {
-  const API_BASE = window.API_BASE;
+  const API_BASE = window.API_BASE; // still used for the photo-screening endpoint only
 
   /* ----------------------------------------------------------------
      Field metadata for the two hand-curated datasets (labels, units,
@@ -59,7 +59,21 @@
     },
   };
 
-  let schema = null; // populated from /api/datasets
+  // Every model now runs fully client-side via ONNX Runtime Web.
+  // No backend needed for structured predictions — just static files.
+  const MODEL_FILES = {
+    heart_disease: "models/heart_disease.onnx",
+    diabetes: "models/diabetes.onnx",
+    breast_cancer: "models/breast_cancer.onnx",
+  };
+  const METADATA_FILES = {
+    heart_disease: "models/heart_disease_metadata.json",
+    diabetes: "models/diabetes_metadata.json",
+    breast_cancer: "models/breast_cancer_metadata.json",
+  };
+
+  let schema = null; // populated from the local metadata JSON files
+  const sessionCache = {}; // dataset key -> ort.InferenceSession (loaded once, reused)
 
   /* ---------------------------------------------------------------- */
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -78,9 +92,14 @@
 
   /* ---------------------------------------------------------------- */
   async function loadSchema() {
-    const res = await fetch(`${API_BASE}/api/datasets`);
-    if (!res.ok) throw new Error("bad schema response");
-    schema = await res.json();
+    const entries = await Promise.all(
+      Object.entries(METADATA_FILES).map(async ([key, path]) => {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`couldn't load ${path}`);
+        return [key, await res.json()];
+      })
+    );
+    schema = Object.fromEntries(entries);
 
     const select = $("#dataset-select");
     select.innerHTML = Object.keys(DATASET_CONFIG)
@@ -98,6 +117,46 @@
         </div>`;
       })
       .join("");
+  }
+
+  // Loads (and caches) the ONNX session for a dataset. Each model is
+  // ~1KB–950KB — trivial to fetch, no backend round-trip involved.
+  async function getSession(datasetKey) {
+    if (sessionCache[datasetKey]) return sessionCache[datasetKey];
+    const session = await ort.InferenceSession.create(MODEL_FILES[datasetKey]);
+    sessionCache[datasetKey] = session;
+    return session;
+  }
+
+  // Runs prediction fully in the browser — this replaces the old
+  // POST /api/predict/structured call. Same response shape as before,
+  // so renderStructuredResult() below needs zero changes.
+  async function predictStructured(datasetKey, features) {
+    const meta = schema[datasetKey];
+    const order = meta.feature_names;
+    const missing = order.filter((f) => !(f in features));
+    if (missing.length) throw new Error(`missing features: ${missing.join(", ")}`);
+
+    const input = Float32Array.from(order.map((f) => features[f]));
+    const session = await getSession(datasetKey);
+    const tensor = new ort.Tensor("float32", input, [1, order.length]);
+    const results = await session.run({ input: tensor });
+
+    // Pipeline was exported with zipmap=False, so "probabilities" is a
+    // flat [1, 2] float tensor: [P(class 0), P(class 1)].
+    const probs = results.probabilities.data;
+    const proba = probs[1];
+    const prediction = proba >= 0.5 ? 1 : 0;
+
+    return {
+      dataset: datasetKey,
+      display_name: meta.display_name,
+      positive_label: meta.positive_label,
+      prediction,
+      probability: Math.round(proba * 10000) / 10000,
+      risk_level: proba >= 0.66 ? "high" : proba >= 0.33 ? "moderate" : "low",
+      model_used: meta.best_model,
+    };
   }
 
   function renderStructuredForm(datasetKey) {
@@ -185,15 +244,11 @@
       const readout = $("#structured-readout");
       readout.innerHTML = `<div class="readout-empty"><p>Running prediction…</p></div>`;
       try {
-        const res = await fetch(`${API_BASE}/api/predict/structured`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ dataset: datasetKey, features }),
-        });
-        if (!res.ok) throw new Error((await res.json()).detail || "prediction failed");
-        renderStructuredResult(await res.json());
+        const data = await predictStructured(datasetKey, features);
+        renderStructuredResult(data);
       } catch (err) {
-        errorReadout(readout, `Couldn't reach the API — is the backend running at ${API_BASE}? (${err.message})`);
+        errorReadout(readout, `Prediction failed: ${err.message}`);
+        console.error(err);
       }
     });
   }
@@ -229,6 +284,15 @@
     submitBtn.addEventListener("click", async () => {
       if (!currentFile) return;
       const readout = $("#image-readout");
+
+      // Photo screening still needs a backend (scikit-image feature
+      // extraction isn't ported to JS yet). If no API_BASE is set,
+      // tell the user plainly instead of failing silently.
+      if (!API_BASE) {
+        errorReadout(readout, "Photo screening isn't available in the static build yet — this feature still needs a backend.");
+        return;
+      }
+
       readout.innerHTML = `<div class="readout-empty"><p>Analyzing photo…</p></div>`;
       const formData = new FormData();
       formData.append("file", currentFile);
@@ -247,7 +311,7 @@
   wireStructuredMode();
   wireImageMode();
   loadSchema().catch((err) => {
-    errorReadout($("#structured-readout"), `Couldn't load dataset info from ${API_BASE}. Start the backend (see README) then reload.`);
+    errorReadout($("#structured-readout"), `Couldn't load model files. Make sure the models/ folder was uploaded alongside app.js.`);
     console.error(err);
   });
 })();
