@@ -1,0 +1,40 @@
+{
+  "dataset_key": "diabetes",
+  "display_name": "Diabetes",
+  "positive_label": "Diabetic",
+  "feature_names": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age"
+  ],
+  "best_model": "xgboost",
+  "leaderboard": {
+    "logistic_regression": {
+      "accuracy": 0.7143,
+      "f1": 0.56,
+      "roc_auc": 0.823
+    },
+    "svm_rbf": {
+      "accuracy": 0.7532,
+      "f1": 0.6346,
+      "roc_auc": 0.7924
+    },
+    "random_forest": {
+      "accuracy": 0.7532,
+      "f1": 0.6346,
+      "roc_auc": 0.8121
+    },
+    "xgboost": {
+      "accuracy": 0.7532,
+      "f1": 0.6481,
+      "roc_auc": 0.8315
+    }
+  },
+  "n_samples": 768,
+  "n_features": 8
+}
