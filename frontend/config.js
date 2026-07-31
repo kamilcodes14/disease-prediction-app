@@ -1,5 +1,5 @@
-// Point this at your deployed backend once you deploy it.
-// Locally: leave as-is and run the backend on port 8000 (see backend/README section).
-// On Vercel: set this to your Railway/Render backend URL, e.g.
-//   window.API_BASE = "https://your-backend.up.railway.app";
-window.API_BASE = window.API_BASE || ""; — empty string,;
+// Point this at a separate backend URL only if you deploy the backend
+// elsewhere (e.g. Railway/Render). For this project the backend lives
+// on the same Vercel domain, so leaving this empty is correct — predict
+// calls just use a relative path like /api/predict/image.
+window.API_BASE = window.API_BASE || "";
